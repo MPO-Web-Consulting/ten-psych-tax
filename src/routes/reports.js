@@ -22,6 +22,18 @@ router.get("/reports", (req, res) => {
 // corrupt the header or crash the request with an uncaught 500.
 const FISCAL_YEAR_PATTERN = /^\d{4}-\d{2}$/;
 
+// Turns free-text (client names, categories) into something safe to use as
+// a zip entry name -- strips anything but alphanumerics/dashes/underscores.
+function slugForArchive(value) {
+    return (
+        value
+            .normalize("NFKD")
+            .replace(/[^a-zA-Z0-9]+/g, "-")
+            .replace(/^-+|-+$/g, "")
+            .toLowerCase() || "record"
+    );
+}
+
 router.get("/reports/:fiscalYear/download", async (req, res) => {
     const { fiscalYear } = req.params;
     if (!FISCAL_YEAR_PATTERN.test(fiscalYear)) {
@@ -30,6 +42,10 @@ router.get("/reports/:fiscalYear/download", async (req, res) => {
 
     const invoices = listInvoices({ fiscalYear });
     const expenses = listExpenses({ fiscalYear });
+
+    if (invoices.length === 0 && expenses.length === 0) {
+        return res.status(404).send("No records for that fiscal year");
+    }
 
     const workbook = new ExcelJS.Workbook();
     workbook.creator = "Ten Psych Tax";
@@ -105,12 +121,30 @@ router.get("/reports/:fiscalYear/download", async (req, res) => {
 
     archive.append(workbookBuffer, { name: `tax-report-${fiscalYear}.xlsx` });
 
-    const recordsWithFiles = [...invoices, ...expenses].filter((record) => record.record_filename);
-    for (const record of recordsWithFiles) {
-        const filePath = path.join(UPLOAD_DIR, record.record_filename);
-        if (fs.existsSync(filePath)) {
-            archive.file(filePath, { name: `records/${record.record_filename}` });
+    const usedArchiveNames = new Set();
+    const addRecordToArchive = (record, type, labelParts) => {
+        if (!record.record_filename) {
+            return;
         }
+        const filePath = path.join(UPLOAD_DIR, record.record_filename);
+        if (!fs.existsSync(filePath)) {
+            return;
+        }
+        const ext = path.extname(record.record_filename);
+        const base = slugForArchive(labelParts.join("-"));
+        let entryName = `${base}${ext}`;
+        if (usedArchiveNames.has(entryName)) {
+            entryName = `${base}-${type}${record.id}${ext}`;
+        }
+        usedArchiveNames.add(entryName);
+        archive.file(filePath, { name: `records/${entryName}` });
+    };
+
+    for (const invoice of invoices) {
+        addRecordToArchive(invoice, "invoice", [invoice.paid_date, invoice.client_name]);
+    }
+    for (const expense of expenses) {
+        addRecordToArchive(expense, "expense", [expense.expense_date, humanize(expense.category)]);
     }
 
     await archive.finalize();

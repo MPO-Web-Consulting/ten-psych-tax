@@ -1,0 +1,240 @@
+:root {
+    --color-bg: #f7f7f5;
+    --color-surface: #ffffff;
+    --color-border: #e2e2df;
+    --color-text: #1f1f1d;
+    --color-text-muted: #6b6b66;
+    --color-accent: #2f6f4f;
+    --color-accent-hover: #24593f;
+    --color-error: #b3261e;
+    --color-error-bg: #fbeae9;
+    --radius: 6px;
+    --spacing: 1rem;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: var(--color-text);
+    background: var(--color-bg);
+    line-height: 1.5;
+}
+
+a {
+    color: var(--color-accent);
+}
+
+.container {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: var(--spacing);
+}
+
+.topbar {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 0.75rem 1.5rem;
+    background: var(--color-surface);
+    border-bottom: 1px solid var(--color-border);
+}
+
+.topbar .brand {
+    font-weight: 600;
+    text-decoration: none;
+    color: var(--color-text);
+}
+
+.topbar nav {
+    display: flex;
+    gap: 1rem;
+    flex: 1;
+}
+
+.topbar nav a {
+    text-decoration: none;
+    color: var(--color-text-muted);
+}
+
+.topbar nav a:hover,
+.topbar nav a.active {
+    color: var(--color-text);
+}
+
+.link-button {
+    background: none;
+    border: none;
+    padding: 0;
+    color: var(--color-text-muted);
+    cursor: pointer;
+    font: inherit;
+}
+
+.link-button:hover {
+    color: var(--color-text);
+}
+
+.alert {
+    padding: 0.75rem 1rem;
+    border-radius: var(--radius);
+    margin-bottom: var(--spacing);
+}
+
+.alert-error {
+    background: var(--color-error-bg);
+    color: var(--color-error);
+    border: 1px solid var(--color-error);
+}
+
+.login-card {
+    max-width: 320px;
+    margin: 4rem auto;
+    padding: 2rem;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    text-align: center;
+}
+
+.login-card h1 {
+    font-size: 1.25rem;
+    margin-bottom: 1.5rem;
+}
+
+.login-card form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    text-align: left;
+}
+
+label {
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+}
+
+input,
+select,
+textarea {
+    width: 100%;
+    padding: 0.5rem 0.6rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    font: inherit;
+    background: var(--color-surface);
+    color: var(--color-text);
+}
+
+button {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: var(--radius);
+    background: var(--color-accent);
+    color: #fff;
+    font: inherit;
+    cursor: pointer;
+}
+
+button:hover {
+    background: var(--color-accent-hover);
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    overflow: hidden;
+}
+
+th, td {
+    text-align: left;
+    padding: 0.6rem 0.75rem;
+    border-bottom: 1px solid var(--color-border);
+}
+
+th {
+    background: var(--color-bg);
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+}
+
+tr:last-child td {
+    border-bottom: none;
+}
+
+.toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing);
+}
+
+.card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: var(--spacing);
+    margin-bottom: var(--spacing);
+}
+
+.stat-row {
+    display: flex;
+    gap: var(--spacing);
+    flex-wrap: wrap;
+}
+
+.stat-row .stat {
+    flex: 1;
+    min-width: 140px;
+}
+
+.stat-label {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+}
+
+.stat-value {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-top: 0.25rem;
+}
+
+.filter-bar {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: var(--spacing);
+    flex-wrap: wrap;
+}
+
+.filter-bar label {
+    margin: 0;
+}
+
+.filter-bar select {
+    width: auto;
+}
+
+.empty-state {
+    color: var(--color-text-muted);
+    text-align: center;
+}
+
+.actions {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+    white-space: nowrap;
+}
+
+.actions form {
+    display: inline;
+}

@@ -1,0 +1,63 @@
+{% extends "base.njk" %}
+
+{% block title %}Invoices — Ten Psych Tax{% endblock %}
+
+{% block content %}
+<div class="toolbar">
+    <h1>Invoices</h1>
+    <a href="/invoices/new"><button type="button">Add invoice</button></a>
+</div>
+
+{% if fiscalYears.length %}
+<form method="get" action="/invoices" class="filter-bar">
+    <label for="fiscalYear">Fiscal year</label>
+    <select name="fiscalYear" id="fiscalYear" onchange="this.form.submit()">
+        {% for year in fiscalYears %}
+        <option value="{{ year }}" {% if year == selectedYear %}selected{% endif %}>{{ year }}</option>
+        {% endfor %}
+    </select>
+</form>
+{% endif %}
+
+{% if not invoices.length %}
+<div class="card empty-state">
+    <p>No invoices recorded for this fiscal year yet.</p>
+</div>
+{% else %}
+<table>
+    <thead>
+        <tr>
+            <th>Date Paid</th>
+            <th>Client</th>
+            <th>Description</th>
+            <th>Amount</th>
+            <th>Record</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for invoice in invoices %}
+        <tr>
+            <td>{{ invoice.paid_date }}</td>
+            <td>{{ invoice.client_name }}</td>
+            <td>{{ invoice.description or "" }}</td>
+            <td>${{ invoice.amountDisplay }}</td>
+            <td>
+                {% if invoice.record_filename %}
+                <a href="/uploads/{{ invoice.record_filename }}" target="_blank">View</a>
+                {% endif %}
+            </td>
+            <td class="actions">
+                <a href="/invoices/{{ invoice.id }}/edit">Edit</a>
+                <form method="post" action="/invoices/{{ invoice.id }}/delete"
+                      hx-post="/invoices/{{ invoice.id }}/delete" hx-target="closest tr" hx-swap="outerHTML"
+                      hx-confirm="Delete this invoice?">
+                    <button type="submit" class="link-button">Delete</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endif %}
+{% endblock %}

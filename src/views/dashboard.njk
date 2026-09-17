@@ -1,0 +1,72 @@
+{% extends "base.njk" %}
+
+{% block title %}Dashboard — Ten Psych Tax{% endblock %}
+
+{% block content %}
+<div class="toolbar">
+    <h1>Dashboard</h1>
+    {% if fiscalYears.length %}
+    <form method="get" action="/">
+        <select name="fiscalYear" onchange="this.form.submit()">
+            {% for year in fiscalYears %}
+            <option value="{{ year }}" {% if year == selectedYear %}selected{% endif %}>{{ year }}</option>
+            {% endfor %}
+        </select>
+    </form>
+    {% endif %}
+</div>
+
+{% if not fiscalYears.length %}
+<div class="card empty-state">
+    <p>No invoices or expenses recorded yet.</p>
+    <p><a href="/invoices/new">Add an invoice</a> or <a href="/expenses/new">add an expense</a> to get started.</p>
+</div>
+{% else %}
+<div class="stat-row">
+    <div class="card stat"><span class="stat-label">Income</span><div class="stat-value">${{ totalIncome }}</div></div>
+    <div class="card stat"><span class="stat-label">Expenses</span><div class="stat-value">${{ totalExpense }}</div></div>
+    <div class="card stat"><span class="stat-label">Net</span><div class="stat-value">${{ net }}</div></div>
+</div>
+
+<div class="card">
+    <h2>Income vs Expenses by Fiscal Year</h2>
+    <canvas id="trendChart" height="110"></canvas>
+</div>
+
+<div class="card">
+    <h2>Expense Breakdown — {{ selectedYear }}</h2>
+    <canvas id="categoryChart" height="110"></canvas>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+{% if fiscalYears.length %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js" integrity="sha384-NrKB+u6Ts6AtkIhwPixiKTzgSKNblyhlk0Sohlgar9UHUBzai/sgnNNWWd291xqt" crossorigin="anonymous"></script>
+<script>
+    const trendData = {{ trendData | safe }};
+    const categoryData = {{ categoryData | safe }};
+
+    new Chart(document.getElementById("trendChart"), {
+        type: "bar",
+        data: {
+            labels: trendData.map((d) => d.fiscalYear),
+            datasets: [
+                { label: "Income", data: trendData.map((d) => d.incomeCents / 100), backgroundColor: "#2f6f4f" },
+                { label: "Expenses", data: trendData.map((d) => d.expenseCents / 100), backgroundColor: "#b3261e" }
+            ]
+        },
+        options: { responsive: true, scales: { y: { beginAtZero: true } } }
+    });
+
+    new Chart(document.getElementById("categoryChart"), {
+        type: "doughnut",
+        data: {
+            labels: categoryData.map((d) => d.category),
+            datasets: [{ data: categoryData.map((d) => d.cents / 100), backgroundColor: ["#2f6f4f", "#4c8f6d", "#7fae8f", "#b3261e", "#d98c86", "#e8b74f", "#6b6b66", "#a3a39d", "#3d5a80"] }]
+        },
+        options: { responsive: true }
+    });
+</script>
+{% endif %}
+{% endblock %}

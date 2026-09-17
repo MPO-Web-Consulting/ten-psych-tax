@@ -1,0 +1,71 @@
+{% extends "base.njk" %}
+
+{% block title %}Expenses — Ten Psych Tax{% endblock %}
+
+{% block content %}
+<div class="toolbar">
+    <h1>Expenses</h1>
+    <a href="/expenses/new"><button type="button">Add expense</button></a>
+</div>
+
+<form method="get" action="/expenses" class="filter-bar">
+    {% if fiscalYears.length %}
+    <label for="fiscalYear">Fiscal year</label>
+    <select name="fiscalYear" id="fiscalYear" onchange="this.form.submit()">
+        {% for year in fiscalYears %}
+        <option value="{{ year }}" {% if year == selectedYear %}selected{% endif %}>{{ year }}</option>
+        {% endfor %}
+    </select>
+    {% endif %}
+
+    <label for="category">Category</label>
+    <select name="category" id="category" onchange="this.form.submit()">
+        <option value="">All</option>
+        {% for option in categoryOptions %}
+        <option value="{{ option.value }}" {% if option.value == selectedCategory %}selected{% endif %}>{{ option.label }}</option>
+        {% endfor %}
+    </select>
+</form>
+
+{% if not expenses.length %}
+<div class="card empty-state">
+    <p>No expenses recorded for this filter yet.</p>
+</div>
+{% else %}
+<table>
+    <thead>
+        <tr>
+            <th>Date</th>
+            <th>Category</th>
+            <th>Description</th>
+            <th>Amount</th>
+            <th>Record</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for expense in expenses %}
+        <tr>
+            <td>{{ expense.expense_date }}</td>
+            <td>{{ expense.categoryLabel }}</td>
+            <td>{{ expense.description }}</td>
+            <td>${{ expense.amountDisplay }}</td>
+            <td>
+                {% if expense.record_filename %}
+                <a href="/uploads/{{ expense.record_filename }}" target="_blank">View</a>
+                {% endif %}
+            </td>
+            <td class="actions">
+                <a href="/expenses/{{ expense.id }}/edit">Edit</a>
+                <form method="post" action="/expenses/{{ expense.id }}/delete"
+                      hx-post="/expenses/{{ expense.id }}/delete" hx-target="closest tr" hx-swap="outerHTML"
+                      hx-confirm="Delete this expense?">
+                    <button type="submit" class="link-button">Delete</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endif %}
+{% endblock %}

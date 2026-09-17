@@ -1,0 +1,33 @@
+{% extends "base.njk" %}
+
+{% block title %}Reports — Ten Psych Tax{% endblock %}
+
+{% block content %}
+<h1>Tax Reports</h1>
+
+{% if not fiscalYears.length %}
+<div class="card empty-state">
+    <p>No invoices or expenses recorded yet, so there's nothing to report.</p>
+</div>
+{% else %}
+<div class="card">
+    <p>Each report bundles an Excel summary (income, expenses, and totals) together with the original uploaded records for that fiscal year, as a single zip file for your accountant.</p>
+    <table>
+        <thead>
+            <tr>
+                <th>Fiscal Year</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for year in fiscalYears %}
+            <tr>
+                <td>{{ year }}</td>
+                <td><a href="/reports/{{ year }}/download"><button type="button">Download report</button></a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+{% endblock %}

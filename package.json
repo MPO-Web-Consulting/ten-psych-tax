@@ -8,13 +8,17 @@
         "build": "webpack --mode production",
         "build:dev": "webpack --mode development",
         "watch": "webpack --mode development --watch",
-        "start": "node server.js"
+        "start": "node server.js",
+        "create-env": "scripts/create-env.sh"
     },
     "dependencies": {
+        "archiver": "^7.0.1",
         "better-sqlite3": "^12.4.1",
+        "exceljs": "^4.4.0",
         "express": "^5.1.0",
+        "express-session": "^1.18.2",
         "multer": "^2.0.2",
-        "nunjucks": "^3.2.8"
+        "nunjucks": "^3.2.4"
     },
     "devDependencies": {
         "webpack": "^5.101.3",

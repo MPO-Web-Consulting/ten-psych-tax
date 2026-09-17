@@ -1,0 +1,37 @@
+{% extends "base.njk" %}
+
+{% block title %}{% if expense %}Edit Expense{% else %}Add Expense{% endif %} — Ten Psych Tax{% endblock %}
+
+{% block content %}
+<h1>{% if expense %}Edit Expense{% else %}Add Expense{% endif %}</h1>
+
+<form class="card" method="post"
+      action="{% if expense and expense.id %}/expenses/{{ expense.id }}{% else %}/expenses{% endif %}"
+      enctype="multipart/form-data">
+    <label for="description">Description</label>
+    <input type="text" id="description" name="description" value="{{ expense.description or '' }}" required>
+
+    <label for="category">Category</label>
+    <select id="category" name="category" required>
+        <option value="" disabled {% if not expense %}selected{% endif %}>Select a category</option>
+        {% for option in categoryOptions %}
+        <option value="{{ option.value }}" {% if expense and expense.category == option.value %}selected{% endif %}>{{ option.label }}</option>
+        {% endfor %}
+    </select>
+
+    <label for="amount">Amount ($)</label>
+    <input type="number" id="amount" name="amount" step="0.01" min="0"
+           value="{{ (expense.amount_cents / 100) if (expense and expense.amount_cents) else '' }}" required>
+
+    <label for="expenseDate">Date</label>
+    <input type="date" id="expenseDate" name="expenseDate" value="{{ expense.expense_date or '' }}" required>
+
+    <label for="record">Original record (receipt)</label>
+    <input type="file" id="record" name="record" accept="application/pdf,image/jpeg,image/png,image/webp">
+    {% if expense and expense.record_filename %}
+    <p><a href="/uploads/{{ expense.record_filename }}" target="_blank">Current file: {{ expense.record_filename }}</a></p>
+    {% endif %}
+
+    <button type="submit">{% if expense and expense.id %}Save changes{% else %}Add expense{% endif %}</button>
+</form>
+{% endblock %}

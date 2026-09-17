@@ -10,21 +10,11 @@ const {
     deleteExpense
 } = require("../models/expense");
 const { formatCents, parseCentsInput, humanize } = require("../lib/format");
+const { fiscalYearFor } = require("../lib/fiscalYear");
 
 const router = express.Router();
 
 const categoryOptions = EXPENSE_CATEGORIES.map((value) => ({ value, label: humanize(value) }));
-
-const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
-const AMOUNT_PATTERN = /^\d+(\.\d{1,2})?$/;
-
-function isValidAmount(raw) {
-    return typeof raw === "string" && AMOUNT_PATTERN.test(raw.trim());
-}
-
-function isValidDate(raw) {
-    return typeof raw === "string" && DATE_PATTERN.test(raw) && !Number.isNaN(Date.parse(raw));
-}
 
 function decorate(expense) {
     return { ...expense, amountDisplay: formatCents(expense.amount_cents), categoryLabel: humanize(expense.category) };
@@ -47,21 +37,19 @@ router.get("/expenses/new", (req, res) => {
 
 router.post("/expenses", upload.single("record"), (req, res) => {
     const { description, category, amount, expenseDate } = req.body;
+    const amountCents = parseCentsInput(amount);
+    const fiscalYear = fiscalYearFor(expenseDate);
+
     const errors = [];
     if (!description || !description.trim()) errors.push("Description is required");
     if (!EXPENSE_CATEGORIES.includes(category)) errors.push("Unknown category");
-    if (!isValidAmount(amount)) errors.push("Enter a valid amount");
-    if (!isValidDate(expenseDate)) errors.push("Enter a valid date");
+    if (amountCents === null) errors.push("Enter a valid amount");
+    if (fiscalYear === null) errors.push("Enter a valid date");
 
     if (errors.length) {
         if (req.file) deleteUploadedFile(req.file.filename);
         return res.status(400).render("expenses/form.njk", {
-            expense: {
-                description,
-                category,
-                amount_cents: isValidAmount(amount) ? parseCentsInput(amount) : undefined,
-                expense_date: expenseDate
-            },
+            expense: { description, category, amount_cents: amountCents, expense_date: expenseDate },
             categoryOptions,
             error: errors.join(", ")
         });
@@ -70,7 +58,7 @@ router.post("/expenses", upload.single("record"), (req, res) => {
     createExpense({
         description,
         category,
-        amountCents: parseCentsInput(amount),
+        amountCents,
         expenseDate,
         recordFilename: req.file ? req.file.filename : null
     });
@@ -91,11 +79,14 @@ router.post("/expenses/:id", upload.single("record"), (req, res) => {
     }
 
     const { description, category, amount, expenseDate } = req.body;
+    const amountCents = amount !== undefined ? parseCentsInput(amount) : undefined;
+    const fiscalYear = expenseDate !== undefined ? fiscalYearFor(expenseDate) : undefined;
+
     const errors = [];
     if (description !== undefined && !description.trim()) errors.push("Description is required");
     if (category !== undefined && !EXPENSE_CATEGORIES.includes(category)) errors.push("Unknown category");
-    if (amount !== undefined && !isValidAmount(amount)) errors.push("Enter a valid amount");
-    if (expenseDate !== undefined && !isValidDate(expenseDate)) errors.push("Enter a valid date");
+    if (amount !== undefined && amountCents === null) errors.push("Enter a valid amount");
+    if (expenseDate !== undefined && fiscalYear === null) errors.push("Enter a valid date");
 
     if (errors.length) {
         if (req.file) deleteUploadedFile(req.file.filename);
@@ -104,7 +95,7 @@ router.post("/expenses/:id", upload.single("record"), (req, res) => {
                 id: req.params.id,
                 description,
                 category,
-                amount_cents: amount && isValidAmount(amount) ? parseCentsInput(amount) : existing.amount_cents,
+                amount_cents: amountCents ?? existing.amount_cents,
                 expense_date: expenseDate
             },
             categoryOptions,
@@ -115,7 +106,7 @@ router.post("/expenses/:id", upload.single("record"), (req, res) => {
     updateExpense(req.params.id, {
         description,
         category,
-        amountCents: amount ? parseCentsInput(amount) : undefined,
+        amountCents,
         expenseDate,
         recordFilename: req.file ? req.file.filename : undefined
     });

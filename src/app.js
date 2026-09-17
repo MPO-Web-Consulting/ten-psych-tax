@@ -17,6 +17,16 @@ if (!process.env.SESSION_SECRET && process.env.NODE_ENV === "production") {
 
 const app = express();
 
+// Trusts X-Forwarded-* headers from an upstream reverse proxy -- needed for
+// cookie.secure below (and req.ip/req.secure generally) to reflect reality
+// when TLS is terminated in front of this app rather than by it. Opt-in and
+// off by default: this deployment ships with no reverse proxy and no TLS of
+// its own (see README), and blindly trusting these headers with nothing
+// upstream to set them for real would let any client spoof them directly.
+if (process.env.TRUST_PROXY) {
+    app.set("trust proxy", 1);
+}
+
 nunjucks.configure(path.join(__dirname, "views"), {
     autoescape: true,
     express: app,
@@ -28,12 +38,26 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "../public")));
 
+// Without maxAge the cookie (and its MemoryStore entry) lives until the
+// process restarts -- that's the only thing that ever clears a session.
+const SESSION_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
+
 app.use(
     session({
         secret: process.env.SESSION_SECRET || "dev-secret-change-me",
         resave: false,
         saveUninitialized: false,
-        cookie: { httpOnly: true, sameSite: "lax" }
+        cookie: {
+            httpOnly: true,
+            sameSite: "lax",
+            maxAge: SESSION_MAX_AGE_MS,
+            // "auto": marks the cookie Secure only when the connection is
+            // actually TLS (directly, or via the upstream proxy trusted
+            // above) -- so this doesn't break the plain-HTTP deployment
+            // this app ships with by default, but still locks the cookie
+            // down for anyone who does put TLS in front of it.
+            secure: "auto"
+        }
     })
 );
 

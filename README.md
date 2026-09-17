@@ -39,6 +39,12 @@ Required in production, no defaults:
 | `PORT` | Server port (default `3000`) |
 | `NODE_ENV` | Set to `production` for a real deployment |
 
+Optional:
+
+| Variable | Purpose |
+| --- | --- |
+| `TRUST_PROXY` | Set (to any non-empty value) only if this app sits behind a reverse proxy that terminates TLS for it. Without it, the session cookie is never marked `Secure`, which is correct for the plain-HTTP single-container deployment below; with it, the cookie is marked `Secure` whenever the connection is actually HTTPS. Don't set this unless there's a real proxy in front — it makes the app trust `X-Forwarded-*` headers, which a client could otherwise spoof directly. |
+
 Generate a `.env` with random `APP_PASSWORD`/`SESSION_SECRET`:
 
 ```bash

@@ -1,14 +1,18 @@
 :root {
-    --color-bg: #f7f7f5;
+    --color-bg: #f3f4f6;
     --color-surface: #ffffff;
-    --color-border: #e2e2df;
-    --color-text: #1f1f1d;
-    --color-text-muted: #6b6b66;
-    --color-accent: #2f6f4f;
-    --color-accent-hover: #24593f;
-    --color-error: #b3261e;
-    --color-error-bg: #fbeae9;
-    --radius: 6px;
+    --color-border: #d1d5db;
+    --color-text: #1f2937;
+    --color-text-muted: #6b7280;
+    --color-accent: #0d9488;
+    --color-accent-hover: #14b8a6;
+    --color-accent-active: #115e59;
+    --color-accent-tint: #d1faf6;
+    --color-error: #dc2626;
+    --color-error-bg: #fee2e2;
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+    --radius: 8px;
     --spacing: 1rem;
 }
 
@@ -18,7 +22,7 @@
 
 body {
     margin: 0;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-family: system-ui, -apple-system, "Segoe UI", "Roboto", "Ubuntu", "Cantarell", "Noto Sans", sans-serif;
     color: var(--color-text);
     background: var(--color-bg);
     line-height: 1.5;
@@ -41,6 +45,7 @@ a {
     padding: 0.75rem 1.5rem;
     background: var(--color-surface);
     border-bottom: 1px solid var(--color-border);
+    box-shadow: var(--shadow-sm);
 }
 
 .topbar .brand {
@@ -97,6 +102,7 @@ a {
     background: var(--color-surface);
     border: 1px solid var(--color-border);
     border-radius: var(--radius);
+    box-shadow: var(--shadow-md);
     text-align: center;
 }
 
@@ -127,20 +133,33 @@ textarea {
     font: inherit;
     background: var(--color-surface);
     color: var(--color-text);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 2px rgba(20, 184, 166, 0.25);
+    outline: none;
 }
 
 button {
     padding: 0.5rem 1rem;
-    border: none;
+    border: 1px solid var(--color-accent);
     border-radius: var(--radius);
     background: var(--color-accent);
     color: #fff;
     font: inherit;
+    font-weight: 500;
     cursor: pointer;
+    transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
 }
 
 button:hover {
     background: var(--color-accent-hover);
+    border-color: var(--color-accent-hover);
+    transform: translateY(-1px);
 }
 
 table {
@@ -149,6 +168,7 @@ table {
     background: var(--color-surface);
     border: 1px solid var(--color-border);
     border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
     overflow: hidden;
 }
 
@@ -180,6 +200,7 @@ tr:last-child td {
     background: var(--color-surface);
     border: 1px solid var(--color-border);
     border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
     padding: var(--spacing);
     margin-bottom: var(--spacing);
 }
@@ -228,6 +249,17 @@ tr:last-child td {
     text-align: center;
 }
 
+.empty-state-list {
+    display: inline-block;
+    text-align: left;
+    margin: 0.75rem 0;
+    padding-left: 1.25rem;
+}
+
+.empty-state-list li {
+    margin-bottom: 0.25rem;
+}
+
 .actions {
     display: flex;
     gap: 0.75rem;
@@ -237,4 +269,53 @@ tr:last-child td {
 
 .actions form {
     display: inline;
+}
+
+.field-hint {
+    margin: 0.15rem 0 0.75rem;
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+}
+
+.help-menu {
+    position: relative;
+}
+
+.help-menu summary {
+    list-style: none;
+    cursor: pointer;
+    color: var(--color-text-muted);
+    user-select: none;
+}
+
+.help-menu summary::-webkit-details-marker {
+    display: none;
+}
+
+.help-menu summary:hover,
+.help-menu[open] summary {
+    color: var(--color-text);
+}
+
+.help-panel {
+    position: absolute;
+    top: calc(100% + 0.75rem);
+    right: 0;
+    width: 280px;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-md);
+    padding: 1rem;
+    font-size: 0.85rem;
+    color: var(--color-text);
+    z-index: 10;
+}
+
+.help-panel p {
+    margin: 0 0 0.6rem;
+}
+
+.help-panel p:last-child {
+    margin-bottom: 0;
 }

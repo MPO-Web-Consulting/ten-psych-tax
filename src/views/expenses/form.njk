@@ -1,6 +1,6 @@
 {% extends "base.njk" %}
 
-{% block title %}{% if expense %}Edit Expense{% else %}Add Expense{% endif %} — Ten Psych Tax{% endblock %}
+{% block title %}{% if expense %}Edit Expense{% else %}Add Expense{% endif %} — 10Psych Tax{% endblock %}
 
 {% block content %}
 <h1>{% if expense %}Edit Expense{% else %}Add Expense{% endif %}</h1>
@@ -9,7 +9,7 @@
       action="{% if expense and expense.id %}/expenses/{{ expense.id }}{% else %}/expenses{% endif %}"
       enctype="multipart/form-data">
     <label for="description">Description</label>
-    <input type="text" id="description" name="description" value="{{ expense.description or '' }}" required>
+    <input type="text" id="description" name="description" placeholder="e.g. Annual registration fee" value="{{ expense.description or '' }}" required>
 
     <label for="category">Category</label>
     <select id="category" name="category" required>
@@ -28,6 +28,7 @@
 
     <label for="record">Original record (receipt)</label>
     <input type="file" id="record" name="record" accept="application/pdf,image/jpeg,image/png,image/webp">
+    <p class="field-hint">Optional, but it'll be bundled into your yearly report zip for the accountant.</p>
     {% if expense and expense.record_filename %}
     <p><a href="/uploads/{{ expense.record_filename }}" target="_blank">Current file: {{ expense.record_filename }}</a></p>
     {% endif %}

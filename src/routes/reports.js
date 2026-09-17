@@ -48,7 +48,7 @@ router.get("/reports/:fiscalYear/download", async (req, res) => {
     }
 
     const workbook = new ExcelJS.Workbook();
-    workbook.creator = "Ten Psych Tax";
+    workbook.creator = "10Psych Tax";
     workbook.created = new Date();
 
     const incomeSheet = workbook.addWorksheet("Income");

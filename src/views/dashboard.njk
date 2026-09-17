@@ -1,6 +1,6 @@
 {% extends "base.njk" %}
 
-{% block title %}Dashboard — Ten Psych Tax{% endblock %}
+{% block title %}Dashboard — 10Psych Tax{% endblock %}
 
 {% block content %}
 <div class="toolbar">
@@ -18,8 +18,13 @@
 
 {% if not fiscalYears.length %}
 <div class="card empty-state">
-    <p>No invoices or expenses recorded yet.</p>
-    <p><a href="/invoices/new">Add an invoice</a> or <a href="/expenses/new">add an expense</a> to get started.</p>
+    <p><strong>Welcome to 10Psych Tax.</strong> Come back here whenever you get paid or spend on the business:</p>
+    <ul class="empty-state-list">
+        <li>Log paid invoices and categorized expenses as they happen</li>
+        <li>See income vs. expenses graphed by fiscal year</li>
+        <li>Download a yearly report — Excel summary + receipts — for your accountant</li>
+    </ul>
+    <p><a href="/invoices/new"><button type="button">Add your first invoice</button></a> or <a href="/expenses/new">add an expense</a> to get started.</p>
 </div>
 {% else %}
 <div class="stat-row">
@@ -52,8 +57,8 @@
         data: {
             labels: trendData.map((d) => d.fiscalYear),
             datasets: [
-                { label: "Income", data: trendData.map((d) => d.incomeCents / 100), backgroundColor: "#2f6f4f" },
-                { label: "Expenses", data: trendData.map((d) => d.expenseCents / 100), backgroundColor: "#b3261e" }
+                { label: "Income", data: trendData.map((d) => d.incomeCents / 100), backgroundColor: "#0d9488" },
+                { label: "Expenses", data: trendData.map((d) => d.expenseCents / 100), backgroundColor: "#dc2626" }
             ]
         },
         options: { responsive: true, scales: { y: { beginAtZero: true } } }
@@ -63,7 +68,7 @@
         type: "doughnut",
         data: {
             labels: categoryData.map((d) => d.category),
-            datasets: [{ data: categoryData.map((d) => d.cents / 100), backgroundColor: ["#2f6f4f", "#4c8f6d", "#7fae8f", "#b3261e", "#d98c86", "#e8b74f", "#6b6b66", "#a3a39d", "#3d5a80"] }]
+            datasets: [{ data: categoryData.map((d) => d.cents / 100), backgroundColor: ["#2a78d6", "#eb6834", "#1baf7a", "#eda100", "#e87ba4", "#008300", "#4a3aa7", "#e34948"] }]
         },
         options: { responsive: true }
     });

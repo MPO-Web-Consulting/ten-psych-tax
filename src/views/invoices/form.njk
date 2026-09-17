@@ -1,6 +1,6 @@
 {% extends "base.njk" %}
 
-{% block title %}{% if invoice %}Edit Invoice{% else %}Add Invoice{% endif %} — Ten Psych Tax{% endblock %}
+{% block title %}{% if invoice %}Edit Invoice{% else %}Add Invoice{% endif %} — 10Psych Tax{% endblock %}
 
 {% block content %}
 <h1>{% if invoice %}Edit Invoice{% else %}Add Invoice{% endif %}</h1>
@@ -9,10 +9,10 @@
       action="{% if invoice %}/invoices/{{ invoice.id }}{% else %}/invoices{% endif %}"
       enctype="multipart/form-data">
     <label for="clientName">Client name</label>
-    <input type="text" id="clientName" name="clientName" value="{{ invoice.client_name or '' }}" required>
+    <input type="text" id="clientName" name="clientName" placeholder="e.g. Jane Doe" value="{{ invoice.client_name or '' }}" required>
 
     <label for="description">Description</label>
-    <input type="text" id="description" name="description" value="{{ invoice.description or '' }}">
+    <input type="text" id="description" name="description" placeholder="e.g. Initial consultation" value="{{ invoice.description or '' }}">
 
     <label for="amount">Amount ($)</label>
     <input type="number" id="amount" name="amount" step="0.01" min="0"
@@ -20,9 +20,11 @@
 
     <label for="paidDate">Date paid</label>
     <input type="date" id="paidDate" name="paidDate" value="{{ invoice.paid_date or '' }}" required>
+    <p class="field-hint">This is tracked cash-basis — the invoice counts toward the fiscal year it was paid in, not issued.</p>
 
     <label for="record">Original record (invoice/receipt)</label>
     <input type="file" id="record" name="record" accept="application/pdf,image/jpeg,image/png,image/webp">
+    <p class="field-hint">Optional, but it'll be bundled into your yearly report zip for the accountant.</p>
     {% if invoice and invoice.record_filename %}
     <p><a href="/uploads/{{ invoice.record_filename }}" target="_blank">Current file: {{ invoice.record_filename }}</a></p>
     {% endif %}

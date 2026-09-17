@@ -16,8 +16,18 @@ router.get("/reports", (req, res) => {
     res.render("reports/index.njk", { fiscalYears });
 });
 
+// Matches the "YYYY-YY" shape fiscalYearFor() produces (e.g. "2025-26").
+// The route param used to be interpolated straight into the zip's
+// Content-Disposition header -- a value with a quote or CR/LF in it could
+// corrupt the header or crash the request with an uncaught 500.
+const FISCAL_YEAR_PATTERN = /^\d{4}-\d{2}$/;
+
 router.get("/reports/:fiscalYear/download", async (req, res) => {
     const { fiscalYear } = req.params;
+    if (!FISCAL_YEAR_PATTERN.test(fiscalYear)) {
+        return res.status(404).send("Unknown fiscal year");
+    }
+
     const invoices = listInvoices({ fiscalYear });
     const expenses = listExpenses({ fiscalYear });
 

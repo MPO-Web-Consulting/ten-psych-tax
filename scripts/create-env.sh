@@ -4,14 +4,20 @@
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-ENV_FILE="${1:-"$ROOT_DIR/.env"}"
 FORCE="${FORCE:-0}"
 
+# Separate the --force flag from the positional destination-path arg -- this
+# used to take $1 as the path unconditionally, so `--force` itself became the
+# destination filename and the real .env was silently left untouched.
+ENV_FILE=""
 for arg in "$@"; do
     if [ "$arg" = "--force" ]; then
         FORCE=1
+    else
+        ENV_FILE="$arg"
     fi
 done
+ENV_FILE="${ENV_FILE:-"$ROOT_DIR/.env"}"
 
 if [ -e "$ENV_FILE" ] && [ "$FORCE" != "1" ]; then
     echo "Refusing to overwrite existing $ENV_FILE (pass --force to regenerate, which invalidates existing sessions and the current password)." >&2

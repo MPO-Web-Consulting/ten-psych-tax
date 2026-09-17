@@ -53,6 +53,12 @@ class VerifiedDiskStorage {
     }
 
     _removeFile(req, file, cb) {
+        // Multer calls this to clean up after ANY error in the request (not
+        // just ones from this file) -- including a file _handleFile rejected
+        // before ever writing it, which never got a `path` assigned. Passing
+        // that undefined straight to fs.unlink throws synchronously and
+        // uncaught, crashing the whole process, not just the request.
+        if (!file.path) return cb(null);
         fs.unlink(file.path, (err) => cb(err && err.code !== "ENOENT" ? err : null));
     }
 }

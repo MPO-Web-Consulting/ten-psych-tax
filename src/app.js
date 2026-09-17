@@ -43,15 +43,19 @@ app.use("/uploads", requireAuth, express.static(UPLOAD_DIR));
 
 app.use("/", routes);
 
-// Multer (bad file type, oversized file) throws outside the normal
-// route flow -- without this handler those requests fall through to
-// Express's default handler and crash with a raw 500 instead of a
-// message the user can act on.
+// Multer (bad file type, unrecognized content, oversized file) throws
+// outside the normal route flow -- without this handler those requests
+// fall through to Express's default handler and crash with a raw 500
+// instead of a message the user can act on. The two message prefixes
+// match the rejection errors middleware/upload.js's fileFilter and
+// VerifiedDiskStorage throw.
+const UPLOAD_REJECTION_PREFIXES = ["Unsupported file type", "Unrecognized or unsupported file content"];
+
 app.use((err, req, res, next) => {
     if (err instanceof multer.MulterError && err.code === "LIMIT_FILE_SIZE") {
         return res.status(413).send("Uploaded file is too large (10MB max).");
     }
-    if (err && typeof err.message === "string" && err.message.startsWith("Unsupported file type")) {
+    if (err && typeof err.message === "string" && UPLOAD_REJECTION_PREFIXES.some((p) => err.message.startsWith(p))) {
         return res.status(400).send(err.message);
     }
     next(err);

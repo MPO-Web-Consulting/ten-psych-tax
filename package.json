@@ -5,9 +5,6 @@
     "description": "Simple tax tracking for psychologists",
     "main": "server.js",
     "scripts": {
-        "build": "webpack --mode production",
-        "build:dev": "webpack --mode development",
-        "watch": "webpack --mode development --watch",
         "start": "node server.js",
         "create-env": "scripts/create-env.sh"
     },
@@ -19,9 +16,5 @@
         "express-session": "^1.18.2",
         "multer": "^2.0.2",
         "nunjucks": "^3.2.4"
-    },
-    "devDependencies": {
-        "webpack": "^5.101.3",
-        "webpack-cli": "^6.0.1"
     }
 }

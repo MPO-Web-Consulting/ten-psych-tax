@@ -51,7 +51,6 @@ Generate a `.env` with random `APP_PASSWORD`/`SESSION_SECRET`:
 ```bash
 npm install
 ./scripts/create-env.sh
-npm run watch    # rebuild client bundle on change, separate terminal
 npm start
 ```
 

@@ -3,11 +3,10 @@ FROM node:22-trixie-slim
 WORKDIR /app
 
 COPY package*.json ./
-RUN npm install
+RUN npm ci --omit=dev
 
 COPY . .
-RUN npm run build && npm prune --omit=dev \
-    && mkdir -p data uploads \
+RUN mkdir -p data uploads \
     && chown -R node:node /app
 
 USER node

@@ -1,5 +1,4 @@
 node_modules/
-public/js/
 data/
 # Trailing /* (not /) so the !negation below can still track .gitkeep --
 # an excluded directory itself can't have its contents un-ignored.

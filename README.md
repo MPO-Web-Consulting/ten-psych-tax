@@ -1,35 +1,43 @@
-# ten psych tax
+# 🧾 ten psych tax
 
-basic tax tracking app for psychologists. Need to keep paid invoices, and expenses for tax time.
+Basic tax tracking app for psychologists. Keeps paid invoices and expenses organized for tax time.
 
-Features:
+## ✨ Features
 
-- input paid invoices (cash basis) and categorized expenses, with original record upload
-- graph income and expenses by fiscal year (Jul-Jun)
-- generate yearly tax report for accountant: excel summary + original records, bundled as a zip
-- list view of invoices and expenses
-- single shared password login
+| | |
+| --- | --- |
+| 💵 | Input paid invoices (cash basis) and categorized expenses, with original record upload |
+| 📊 | Graph income and expenses by fiscal year (Jul–Jun) |
+| 📦 | Generate yearly tax report for accountant: excel summary + original records, bundled as a zip |
+| 📋 | List view of invoices and expenses |
+| 🔒 | Single shared password login |
 
-Design spec:
+## 🏗️ Design spec
 
-- backend: express
-- templates: nunjucks
-- frontend: htmx
-- storage: sqlite
-- uploads: multer, saved to uploads/
-- report: exceljs, zipped with original records
-- deployment: single server, single container
+| Layer | Choice |
+| --- | --- |
+| Backend | Express |
+| Templates | Nunjucks |
+| Frontend | htmx |
+| Storage | SQLite |
+| Uploads | Multer, saved to `uploads/` |
+| Report | ExcelJS, zipped with original records |
+| Deployment | Single server, single container |
 
-Requirements:
+## ✅ Requirements
 
-- Node 22+ (system-packaged Node on older distros is often too old to build `better-sqlite3`; use the devcontainer or a version manager)
+- **Node 22+** — system-packaged Node on older distros is often too old to build `better-sqlite3`; use the devcontainer or a version manager
 
-Environment variables (required, no defaults in production):
+## ⚙️ Environment variables
 
-- `APP_PASSWORD` - shared login password
-- `SESSION_SECRET` - session cookie signing secret
-- `PORT` - default 3000
-- `NODE_ENV` - `production` for a real deployment
+Required in production, no defaults:
+
+| Variable | Purpose |
+| --- | --- |
+| `APP_PASSWORD` | Shared login password |
+| `SESSION_SECRET` | Session cookie signing secret |
+| `PORT` | Server port (default `3000`) |
+| `NODE_ENV` | Set to `production` for a real deployment |
 
 Generate a `.env` with random `APP_PASSWORD`/`SESSION_SECRET`:
 
@@ -38,7 +46,7 @@ Generate a `.env` with random `APP_PASSWORD`/`SESSION_SECRET`:
 ./scripts/create-env.sh --force  # regenerate (invalidates current password/sessions)
 ```
 
-Development:
+## 🚀 Development
 
 ```bash
 npm install
@@ -47,14 +55,15 @@ npm run watch    # rebuild client bundle on change, separate terminal
 npm start
 ```
 
-Deployment (Docker):
+## 🐳 Deployment (Docker)
 
 ```bash
 ./scripts/create-env.sh
 docker compose up -d --build
 ```
 
-`data/` (sqlite db) and `uploads/` (original records) persist in named Docker volumes, not host folders - back them up with:
+> [!NOTE]
+> `data/` (sqlite db) and `uploads/` (original records) persist in named Docker volumes, not host folders — back them up with:
 
 ```bash
 docker run --rm -v ten-psych-tax_data:/data -v ten-psych-tax_uploads:/uploads -v "$(pwd)":/backup busybox \

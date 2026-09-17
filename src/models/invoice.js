@@ -2,7 +2,17 @@ const db = require("../db");
 const { fiscalYearFor } = require("../lib/fiscalYear");
 
 function createInvoice({ clientName, description, amountCents, paidDate, recordFilename }) {
+    if (!clientName || typeof clientName !== "string" || !clientName.trim()) {
+        throw new Error("Invoice requires a client name");
+    }
+    if (!Number.isInteger(amountCents)) {
+        throw new Error("Invoice requires a valid amount");
+    }
     const fiscalYear = fiscalYearFor(paidDate);
+    if (!fiscalYear) {
+        throw new Error(`Invalid paid date: ${paidDate}`);
+    }
+
     const result = db
         .prepare(
             `INSERT INTO invoices (client_name, description, amount_cents, paid_date, fiscal_year, record_filename)
@@ -36,8 +46,16 @@ function updateInvoice(id, { clientName, description, amountCents, paidDate, rec
     const existing = getInvoice(id);
     if (!existing) return null;
 
-    const nextPaidDate = paidDate || existing.paid_date;
-    const fiscalYear = fiscalYearFor(nextPaidDate);
+    if (!clientName || typeof clientName !== "string" || !clientName.trim()) {
+        throw new Error("Invoice requires a client name");
+    }
+    if (!Number.isInteger(amountCents)) {
+        throw new Error("Invoice requires a valid amount");
+    }
+    const fiscalYear = fiscalYearFor(paidDate);
+    if (!fiscalYear) {
+        throw new Error(`Invalid paid date: ${paidDate}`);
+    }
 
     db.prepare(
         `UPDATE invoices SET
@@ -51,10 +69,10 @@ function updateInvoice(id, { clientName, description, amountCents, paidDate, rec
          WHERE id = @id`
     ).run({
         id,
-        clientName: clientName ?? existing.client_name,
+        clientName,
         description: description ?? existing.description,
-        amountCents: amountCents ?? existing.amount_cents,
-        paidDate: nextPaidDate,
+        amountCents,
+        paidDate,
         fiscalYear,
         recordFilename: recordFilename ?? existing.record_filename
     });

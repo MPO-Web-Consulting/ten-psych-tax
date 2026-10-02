@@ -7,6 +7,8 @@ const nunjucks = require("nunjucks");
 const { requireAuth } = require("./middleware/auth");
 const { UPLOAD_DIR } = require("./middleware/upload");
 const routes = require("./routes");
+const db = require("./db");
+const SqliteSessionStore = require("./lib/sqliteSessionStore");
 
 // README documents this as required with "no defaults in production" --
 // silently falling back to a hardcoded secret would let anyone forge a
@@ -38,12 +40,22 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "../public")));
 
-// Without maxAge the cookie (and its MemoryStore entry) lives until the
-// process restarts -- that's the only thing that ever clears a session.
+// Without maxAge the cookie (and its store entry) lives until the process
+// restarts -- that's the only thing that would otherwise ever clear a session.
 const SESSION_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
+
+// express-session's default MemoryStore is unbounded and never expires
+// entries on its own -- with a 7-day cookie that's an unbounded, ever-growing
+// leak for the life of the process (and its own doc string calls it out as
+// not for production). Backing sessions with the app's existing sqlite file
+// instead makes them boundable: expired rows are pruned on an interval below.
+const sessionStore = new SqliteSessionStore(db);
+const SESSION_PRUNE_INTERVAL_MS = 60 * 60 * 1000; // hourly
+setInterval(() => sessionStore.prune(), SESSION_PRUNE_INTERVAL_MS).unref();
 
 app.use(
     session({
+        store: sessionStore,
         secret: process.env.SESSION_SECRET || "dev-secret-change-me",
         resave: false,
         saveUninitialized: false,
